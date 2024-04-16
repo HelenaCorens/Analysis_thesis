@@ -170,8 +170,8 @@ ggplot(data = switch_rates, aes(x = trialnr, y = `transition_new == "switch"`)) 
 # PREP FOR RT & ER ANALYSIS
 
 # RT analysis: remove postnull; remove errors
-
 RTdata_masked <- data_masked[data_masked$correcttarresp != 0, ]
+
 # ER analysis: remove postnull; keep errors
 # since we already did this above, we just use data_masked vor ER - rename for convenience
 
