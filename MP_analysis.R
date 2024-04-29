@@ -260,7 +260,7 @@ ERdata_masked <- data_masked
 
 # M1 (random intercept for each subject)
 modelVSR1 <- glmer(transition_new == "switch" ~ group + (1 | subjID), data = RTdata_masked, family = binomial)
-summary(modelVSR1) # problem: Doesn't follow qqline as wanted: what to do? Looks like steps
+summary(modelVSR1)
 plot(modelVSR1)
 
 qqnorm(resid(modelVSR1))
@@ -394,3 +394,9 @@ summary(modelacc_redslope)
       # plot(modelacc_redslope)
       # qqnorm(resid(modelacc_redslope))
       # qqline(resid(modelacc_redslope))
+
+
+# --- Other things to look at: 
+      # General descriptives
+      # Difference VSR masked / explicit phase
+      
