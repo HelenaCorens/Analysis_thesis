@@ -23,8 +23,7 @@ library(sjPlot) #for plotting lmer and glmer mods
 library(sjstats)
 library(emmeans)
 # library(lmerTest)
-#install.packages("flexplot")
-
+# install.packages("flexplot")
 
 # library(reshape2) # reshape data from wide to long or vice versa
 # library(effects) # plots
@@ -49,18 +48,20 @@ data_all<- read.csv("datalog_complete.csv")
 
 # ----------------------- PREPROCESSING ----------------------- #
 
-# 1. Exclude rejected subjectIDs
+# 1. Exclude rejected subjectIDs: Prolific preselection of participants (see file 'PP_preselection.R')
 excluded_pp <- c("oqe3fa7novfjq7anh5nlnkpynw3obvuq", "yrh96kvpm40jb4hols0d5rpm7fuqksqo", "1z8mdxevdznh8ejg6azbw2ynevccwydp",
                  "e2yuqxbgrx72co6ab6jkks82s7xgtb6h", "seg7h7julqwa3qwm0oh4yf7r0rno8jyc", "zkoxr13g3vlvbzr9vk97b9tsegrrl41j",
                  "n3hkdjov6g8ehptm0cxrof3ak0jfb1px")
 data_all <- data_all[!data_all$subjID %in% excluded_pp, ]
 print(length(unique(data_all$subjID)))
 
-# Subjects w accuracy < 60% are already filtered out in previous R script (see file: MP_ppSelectionR.R)
+    # Subjects w accuracy < 60% are already filtered out -> see file 'PP_preselection.R'
+
 
 # 2. Exclude practice & bisbas ('training'/'questionnaire') block
 # If we want to investigate questionnaire at the end: include questionnaire phase again
 data_all <- subset(data_all, phase!="training" & phase!= "questionnaire")
+
 
 # 3. Remove NULL answers; 'postnull' and 'first' answers (transition_new) (both for accuracy analysis as RT analysis)
 # Replace empty values with '0' in the 'correcttarresp' variable
@@ -71,7 +72,6 @@ data_all$correcttarresp <- ifelse(data_all$correcttarresp == "", 0, data_all$cor
 data_all <- subset(data_all, !(choice == "NULL"))
 
 
-
 # 4. Select variables to use
 analysis <- data_all %>% select(subjID, group, rt, category, choice, transition_new, tarresp, correcttarresp, trialnr, 
                                  blocknr, phase, reward, congruency, payout1, payout2, payout3, payout4, totalpayout, 
@@ -80,6 +80,7 @@ analysis <- data_all %>% select(subjID, group, rt, category, choice, transition_
 # analysis <- select(data_all, all_of(c("subjID", "group", "rt", "category", "choice", "transition_new","tarresp", 
  #                                     "correcttarresp", "trialnr","blocknr", "phase", "reward", "congruency", 
  #                                     "payout1", "payout2", "payout3", "payout4", "totalpayout", "stimulus"  )))
+
 
 # 5. Conversion data type 
 analysis$group <- as.factor(analysis$group)
@@ -103,6 +104,7 @@ analysis$totalpayout <- as.numeric(analysis$totalpayout)
 contrasts(analysis$group) <- contr.sum(levels(analysis$group))
 contrasts(analysis$group)
 
+
 # 6.REMOVE OUTLIERS
 # RT outliers: less than 200ms - more than ?3000ms?
 analysis <- subset(analysis, rt > 200) #lenght(analysis$rt): 18642
@@ -122,7 +124,8 @@ table(analysis$rtoutlier) # 892 rt outliers; 17755 within IQR
 length(analysis$rtoutlier)
 analysis <- subset(analysis,rtoutlier == 0) #lenght(analysis$rt): 17750
 
-# 6. RECODE & SUBSET: MASKED PHASE
+
+# 7. RECODE & SUBSET: MASKED PHASE
 
 # Recode blocknr: 1,2,3,4; then centre it (helps with lme4 models)
 data_masked <- subset(analysis, phase =="masked")
@@ -188,6 +191,7 @@ ggplot(data = summary_data, aes(x = group, y = percentage, fill = transition_new
   facet_wrap(~ phase) +
   theme_minimal()
 
+
 # --- RT PLOTS
 
 # rt skewed to the right: use log_rt!!!!
@@ -250,7 +254,7 @@ ERdata_masked <- data_masked
 
 # ----------------------- ANALYSIS ----------------------- #
 
-options(contrasts = c("contr.sum", "contr.poly"))
+# options(contrasts = c("contr.sum", "contr.poly"))
 
 # --------- VSR
 
